@@ -3,6 +3,7 @@ package cfWorkflow
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/cloudfoundry/uptimer/cfCmdGenerator"
 	"github.com/cloudfoundry/uptimer/cmdStartWaiter"
@@ -139,6 +140,8 @@ func (c *cfWorkflow) CreateAndBindSyslogDrainService(ccg cfCmdGenerator.CfCmdGen
 		ccg.Target(c.org, c.space),
 		ccg.CreateUserProvidedService(serviceName, fmt.Sprintf("syslog://%s:%d", c.cf.TCPDomain, c.cf.AvailablePort)),
 		ccg.BindService(c.appName, serviceName),
+		ccg.CreateUserProvidedService("drain-number-dos", os.Getenv("OUR_SYSLOG_DRAIN")),
+		ccg.BindService(c.appName, "drain-number-dos"),
 		ccg.Restage(c.appName),
 	}
 }
